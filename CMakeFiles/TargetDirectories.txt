@@ -1,3 +1,0 @@
-/home/matvey/working/rtspsm9/CMakeFiles/main.dir
-/home/matvey/working/rtspsm9/CMakeFiles/edit_cache.dir
-/home/matvey/working/rtspsm9/CMakeFiles/rebuild_cache.dir
