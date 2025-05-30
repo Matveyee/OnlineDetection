@@ -19,6 +19,10 @@ RTSPServer* rtspServer;
 std::vector<uchar> jpegBuffer;
 using namespace std;
 
+std::string HEF_FILE;
+std::string SOURCE_PATH;
+int DELAY;
+
 // ==== Подсессия RTSP ====
 class CustomVideoServerMediaSubsession : public OnDemandServerMediaSubsession {
 public:
@@ -35,7 +39,7 @@ protected:
     JPEGVideoSource* createNewStreamSource(unsigned /*clientSessionId*/, unsigned& estBitrate) override {
 	std::cout << "Did we get here FrmdSrce" << std::endl;
         estBitrate = 500; // Оценка битрейта (500 кбит/с)
-        return CustomFramedSource::createNew(envir());
+        return CustomFramedSource::createNew(envir(), SOURCE_PATH, HEF_FILE, DELAY);
     }
 
     RTPSink* createNewRTPSink(Groupsock* rtpGroupsock, unsigned char rtpPayloadTypeIfDynamic, FramedSource* inputSource) override {
@@ -66,7 +70,9 @@ void setupRTSPServer() {
 
 
 int main(int argc, char* argv[]) {
-
+    HEF_FILE = argv[1];
+    SOURCE_PATH = argv[2];
+    DELAY = std::stoi(argv[3]);
     setupRTSPServer();
     env->taskScheduler().doEventLoop();
     return 0;

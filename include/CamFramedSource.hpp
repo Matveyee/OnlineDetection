@@ -8,43 +8,34 @@
 #include <vector>
 #include <mutex>
 #include "opencv2/opencv.hpp"
+#include "hailo/hailort.hpp"
 
 
 class CustomFramedSource :  public JPEGVideoSource{
 public:
 
-    static CustomFramedSource* createNew(UsageEnvironment& env);
+    static CustomFramedSource* createNew(UsageEnvironment& env, std::string source, std::string hef, int delay);
     Boolean isJPEGVideoSource() const override {return True;};
 private:
 
 
-    CustomFramedSource(UsageEnvironment& env);
+    CustomFramedSource(UsageEnvironment& env, std::string source, std::string hef, int delay);
+    
+    static u_int8_t std_luminance_qt[64] ;
+    static u_int8_t std_chrominance_qt[64];
     cv::VideoCapture cap;
 
 public:
 
-    static constexpr u_int8_t std_luminance_qt[64] = {
-     16,  11,  10,  16,  24,  40,  51,  61,
-     12,  12,  14,  19,  26,  58,  60,  55,
-     14,  13,  16,  24,  40,  57,  69,  56,
-     14,  17,  22,  29,  51,  87,  80,  62,
-     18,  22,  37,  56,  68, 109, 103,  77,
-     24,  35,  55, 64,  81, 104, 113,  92,
-     49,  64,  78, 87, 103, 121, 120, 101,
-     72,  92, 95, 98, 112, 100, 103, 99
-    };
-    static constexpr u_int8_t std_chrominance_qt[64] = {
-     17,  18,  24,  47,  99,  99,  99,  99,
-     18,  21,  26,  66,  99,  99,  99,  99,
-     24,  26,  56,  99,  99,  99,  99,  99,
-     47,  66,  99,  99,  99,  99,  99,  99,
-     99,  99,  99,  99,  99,  99,  99,  99,
-     99,  99,  99,  99,  99,  99,  99,  99,
-     99,  99,  99,  99,  99,  99,  99,  99,
-     99,  99,  99,  99,  99,  99,  99,  99
-    };
+    
+    std::unique_ptr<hailort::VDevice> vdevice;
+    std::shared_ptr<hailort::InferModel> infer_model;
+    hailort::ConfiguredInferModel configured_infer_model;
+    int DELAY;
 
-    void* getImage(size_t& size);
+    std::string HEF_FILE;
+
+    void getImage(size_t& size, std::vector<uchar>* data_to_write);
 
     u_int8_t const* quantizationTables(u_int8_t& precision, u_int16_t& length) override;
 
